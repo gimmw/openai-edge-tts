@@ -53,7 +53,11 @@ async def _generate_audio_stream(text, voice, speed):
     except Exception as e:
         print(f"Error converting speed: {e}. Defaulting to +0%.")
         speed_rate = "+0%"
-    
+   
+
+    # Get proxy configuration from environment  
+    https_proxy = os.getenv('HTTPS_PROXY')
+
     # Create the communicator for streaming
     if https_proxy:
       communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate,proxy=os.environ.get('HTTPS_PROXY'))
