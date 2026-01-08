@@ -55,8 +55,11 @@ async def _generate_audio_stream(text, voice, speed):
         speed_rate = "+0%"
     
     # Create the communicator for streaming
-    communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
-    
+    if https_proxy:
+      communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate,proxy=os.environ.get('HTTPS_PROXY'))
+    else:
+      communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
+      
     # Stream the audio data
     async for chunk in communicator.stream():
         if chunk["type"] == "audio":
@@ -82,8 +85,14 @@ async def _generate_audio(text, voice, response_format, speed):
         print(f"Error converting speed: {e}. Defaulting to +0%.")
         speed_rate = "+0%"
 
+    # Get proxy configuration from environment  
+    https_proxy = os.getenv('HTTPS_PROXY')
+
     # Generate the MP3 file
-    communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
+    if https_proxy:
+      communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate,proxy=os.environ.get('HTTPS_PROXY'))
+    else:
+      communicator = edge_tts.Communicate(text=text, voice=edge_tts_voice, rate=speed_rate)
     await communicator.save(temp_mp3_path)
     temp_mp3_file_obj.close() # Explicitly close our file object for the initial mp3
 
